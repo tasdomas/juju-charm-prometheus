@@ -1,0 +1,4 @@
+name: prometheus
+summary: Prometheus scrape target specification layer.
+version: 1
+repo: github.com:tasdomas/juju-interface-prometheus
