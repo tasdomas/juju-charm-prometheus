@@ -1,0 +1,45 @@
+# my global config
+global:
+  scrape_interval:     {{ scrape_interval }} # default scrape_interval
+  evaluation_interval: {{ evaluation_interval }} # default evaluation_interval
+  # scrape_timeout is set to the global default (10s).
+
+  # Attach these extra labels to all timeseries collected by this Prometheus instance.
+  external_labels:
+      monitor: {{ monitor_name }}
+
+{%- if custom_rules_file %}
+rule_files:
+    - {{ custom_rules_file }}
+{%- endif %}
+
+# A scrape configuration containing exactly one endpoint to scrape: 
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'prometheus'
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+    target_groups:
+      - targets: ['{{ private_address }}:9090']
+
+# static-targets
+{%- if static_targets %}
+  - job_name: 'static-targets'
+    target_groups:
+      - targets: {{ static_targets }}
+        labels:
+          group: 'promoagents-static'
+{%- endif %}
+
+# related services (eg collectd)
+{% for job in jobs %}
+  - job_name: '{{job['job_name']}}'
+  {% if 'metrics_path' in job %}
+    metrics_path: '{{job['metrics_path']}}'
+  {% endif %}
+    target_groups:
+      - targets: {{job['targets']}}
+        labels:
+          group: 'promoagents-juju'
+{% endfor %}

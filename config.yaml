@@ -1,0 +1,73 @@
+options:
+  scrape-interval:
+    type: string
+    default: "15s"
+    description: Interval at which to scrape targets
+  evaluation-interval:
+    type: string
+    default: "15s"
+    description: Default evaluation interval
+  static-targets:
+    type: string
+    description: |
+      Where to gather metrics from.
+      Examples:
+        host1.maas:9090
+        host1.maas:9090, host2.maas:9090
+  monitor-name:
+    type: string
+    description: |
+        Prometheus monitor name, will default <service_name>-monitor if not set
+  custom-rules:
+    type: string
+    description: |
+        base64 encoded rules to be loaded by prometheus.yml (custom.rules file)
+  external_url:
+    default: ""
+    type: string
+    description: |
+        The URL under which Prometheus is externally reachable (for example,
+        if Prometheus is served via a reverse proxy). Used for generating
+        relative and absolute links back to Prometheus itself. If the URL
+        has a path portion, it will be used to prefix all HTTP endpoints
+        served by Prometheus. If omitted, relevant URL components will be
+        derived automatically.
+        It's templatized to accept the following vars: {private_address},
+        {public_address}, {port}, thus you can use e.g.:
+        juju set prometheus external_url="http://{private_address}:{port}/"
+
+  install_sources:
+    default: '[ "ppa:canonical-bootstack/prometheus" ]'
+    type: string
+    description: |
+        YAML list of additional installation sources, as a string. The number of
+        install_sources must match the number of install_keys. For example:
+          install_sources: |
+           - ppa:project1/ppa
+           - ppa:project2/ppa
+  install_keys:
+    default: ""
+    type: string
+    description: |
+        YAML list of GPG keys for installation sources, as a string. For apt repository
+        URLs, use the public key ID used to verify package signatures. For 
+        other sources such as PPA, use empty string. This list must have the 
+        same number of elements as install_sources, even if the key items are 
+        all empty string. An example to go with the above for install_sources:
+          install_keys: |
+           - "ABC"
+           - ""
+  nagios_context:
+    default: "juju"
+    type: string
+    description: |
+      A string that will be prepended to instance name to set the host name
+      in nagios. So for instance the hostname would be something like:
+          juju-myservice-0
+      If you're running multiple environments with the same services in them
+      this allows you to differentiate between them.
+  nagios_servicegroups:
+    default: "juju"
+    type: string
+    description: |
+      Comma separated list of nagios servicegroups for the graphite check

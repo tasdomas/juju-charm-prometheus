@@ -1,0 +1,7 @@
+coverage
+mock
+nose
+flake8
+ipython
+ipdb
+charms.reactive
