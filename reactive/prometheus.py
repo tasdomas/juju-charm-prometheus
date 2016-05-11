@@ -98,7 +98,6 @@ def write_prometheus_config_yml():
         'jobs': target_jobs,
         'scrape_jobs': scrape_jobs,
     }
-    print(options)
 
     # custom-rules content must be passed verbatim with e.g.
     #   juju set prometheus custom-rules @my.rules
@@ -215,6 +214,7 @@ def restart_prometheus():
 @when_not('target.available')
 def update_prometheus_no_targets():
     unitdata.kv().set('target_jobs', [])
+    data_changed('target.related_services', [])
     set_state('prometheus.do-check-reconfig')
 
     
@@ -229,8 +229,6 @@ def update_prometheus_no_targets():
 @when('target.available')
 def update_prometheus_targets(target):
     services = target.services()
-    if not data_changed('target.related_services', services):
-        return
     related_targets = []
     for service in services:
         targets = []
@@ -251,9 +249,6 @@ def update_prometheus_targets(target):
 @when('scrape.available')
 def update_prometheus_scrape_targets(target):
     targets = target.targets()
-    print(targets)
-    if not data_changed('scrape.related_services', targets):
-        return
     unitdata.kv().set('scrape_jobs', targets)
     set_state('prometheus.do-check-reconfig')
     
