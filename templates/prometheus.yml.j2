@@ -22,6 +22,15 @@ scrape_configs:
     # scheme defaults to 'http'.
     target_groups:
       - targets: ['{{ private_address }}:9090']
+{%- for scrape_job in scrape_jobs %}
+  - job_name: '{{ scrape_job.job_name }}'
+    metrics_path: '{{ scrape_job.metrics_path }}'
+    target_groups:
+      - targets:
+{%- for target in scrape_job.targets %}
+          - {{ target }}
+{%- endfor %}
+{%- endfor %}
 
 # static-targets
 {%- if static_targets %}
