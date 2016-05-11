@@ -80,6 +80,7 @@ def validate_config():
 def write_prometheus_config_yml():
     config = hookenv.config()
     target_jobs = unitdata.kv().get('target_jobs', [])
+    scrape_jobs = unitdata.kv().get('scrape_jobs', [])
 
     # transform eg. 'h1:p1 ,  h2:p2' (string), to ['h1:p1', 'h2:p2'] (list)
     static_targets = None
@@ -95,6 +96,7 @@ def write_prometheus_config_yml():
         'private_address': hookenv.unit_get('private-address'),
         'monitor_name': config.get('monitor_name', default_monitor_name),
         'jobs': target_jobs,
+        'scrape_jobs': scrape_jobs,
     }
 
     # custom-rules content must be passed verbatim with e.g.
@@ -212,6 +214,7 @@ def restart_prometheus():
 @when_not('target.available')
 def update_prometheus_no_targets():
     unitdata.kv().set('target_jobs', [])
+    data_changed('target.related_services', [])
     set_state('prometheus.do-check-reconfig')
 
     
@@ -226,8 +229,6 @@ def update_prometheus_no_targets():
 @when('target.available')
 def update_prometheus_targets(target):
     services = target.services()
-    if not data_changed('target.related_services', services):
-        return
     related_targets = []
     for service in services:
         targets = []
@@ -248,8 +249,6 @@ def update_prometheus_targets(target):
 @when('scrape.available')
 def update_prometheus_scrape_targets(target):
     targets = target.targets()
-    if not data_changed('scrape.related_services', services):
-        return
     unitdata.kv().set('scrape_jobs', targets)
     set_state('prometheus.do-check-reconfig')
     
@@ -287,7 +286,7 @@ def update_nrpe_config(svc):
     hostname = nrpe.get_nagios_hostname()
     current_unit = nrpe.get_nagios_unit_name()
     nrpe_setup = nrpe.NRPE(hostname=hostname)
-    nrpe.add_init_service_checks(nrpe_setup, services(), current_unit)
+    nrpe.add_init_service_checks(nrpe_setup, [SVCNAME], current_unit)
     nrpe_setup.write()
 
 
@@ -297,8 +296,3 @@ def provide_grafana_source(grafana):
     kv = unitdata.kv()
     port = kv.get('prometheus.port')
     grafana.provide('prometheus', port, 'Juju generated source')
-
-
-def services():
-    svcs = [SVCNAME]
-    return svcs
