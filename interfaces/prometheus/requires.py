@@ -49,11 +49,11 @@ class PrometheusRequires(RelationBase):
             host = conv.get_remote('hostname') or conv.get_remote('private-address')
             port = conv.get_remote('port')
             if host and port:
-                service['targets'].append('%s:%s'.format((host, port)))
+                service['targets'].append('{}:{}'.format(host, port))
             if conv.get_remote('metrics_path'):
                 service['metrics_path'] = conv.get_remote('metrics_path')
             if conv.get_remote('scrape_interval'):
                 service['scrape_interval'] = conv.get_remote('scrape_interval')
             if conv.get_remote('scrape_timeout'):
                 service['scrape_timeout'] = conv.get_remote('scrape_timeout')
-        return [s for s in services.values() if s['hosts']]
+        return [s for s in services.values() if s['targets']]
