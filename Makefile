@@ -5,7 +5,7 @@ endif
 all: $(JUJU_REPOSITORY)/trusty/prometheus
 
 $(JUJU_REPOSITORY)/trusty/prometheus:
-	LAYER_PATH=$(shell pwd)/layers INTERFACE_PATH=$(shell pwd)/interfaces charm build 
+	LAYER_PATH=$(shell pwd)/layers INTERFACE_PATH=$(shell pwd)/interfaces charm build -s trusty
 
 unittest:
 	tox
