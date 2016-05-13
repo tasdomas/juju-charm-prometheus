@@ -1,4 +1,3 @@
-
 ifndef JUJU_REPOSITORY
 	$(error JUJU_REPOSITORY is undefined)
 endif
@@ -6,7 +5,7 @@ endif
 all: $(JUJU_REPOSITORY)/trusty/prometheus
 
 $(JUJU_REPOSITORY)/trusty/prometheus:
-	INTERFACE_PATH=$(shell pwd)/layers charm build 
+	LAYER_PATH=$(shell pwd)/layers INTERFACE_PATH=$(shell pwd)/interfaces charm build 
 
 unittest:
 	tox
