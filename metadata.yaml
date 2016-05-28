@@ -17,6 +17,8 @@ provides:
   nrpe-external-master:
     interface: nrpe-external-master
     scope: container
+  website:
+    interface: http
 requires:
   target:
     interface: http

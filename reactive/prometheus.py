@@ -296,3 +296,11 @@ def provide_grafana_source(grafana):
     kv = unitdata.kv()
     port = kv.get('prometheus.port')
     grafana.provide('prometheus', port, 'Juju generated source')
+
+
+@when('prometheus.started')
+@when('website.available')
+def provide_website(website):
+    kv = unitdata.kv()
+    port = kv.get('prometheus.port')
+    website.configure(port)
